@@ -32,7 +32,7 @@ let handlers = {
   //     this.response.speak(userLocation + " has been set");
   //     this.emit(':responseReady');
   //   },
-  'recordIntent': async function() {
+  'recordIntent': function() {
     let date = new Date();
     let startTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
     let dateStamp = `${date.getMonth()}-${date.getDate()}-${date.getFullYear()}`;
@@ -46,17 +46,16 @@ let handlers = {
         "date": dateStamp,
       }
     };
-    await ddb.put(params,(err,data)=>{
+    ddb.put(params,(err,data)=>{
       if (err){
         console.log(err)
       }else{
         console.log(data)
+        this.emit(":ask", "Recording");
       }
-    }).promise();
-    this.emit(":ask", "Recording");
-
+    });
   },
-  'stopRecordingintent': async function(){
+  'stopRecordingintent': function(){
     //failure here//
     let date = new Date();
     let endTime = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
@@ -72,16 +71,15 @@ let handlers = {
       },
       ReturnValues:"UPDATED_NEW"
     };
-    await ddb.update(params,(err,data)=>{
+    ddb.update(params,(err,data)=>{
       if (err){
         this.response.speak(err);
         this.emit(':responseReady');
       }else{
         this.emit(":ask", "Ending recording, say seizure type or skip to end session.");
       }
-    }).promise();
-
-  },'seizureTypeintent': async function(){
+    });
+  },'seizureTypeintent': function(){
     let date = new Date();
     let seizureCategory = this.event.request.intent.slots.seizure.value;
 
@@ -98,14 +96,14 @@ let handlers = {
       ReturnValues:"UPDATED_NEW"
     };
 
-    await ddb.update(params,(err,data)=>{
+    ddb.update(params,(err,data)=>{
       if (err){
         console.log(err)
       }else{
         this.response.speak("Information has been recorded.")
         this.emit(':responseReady');
       }
-    }).promise();
+    });
 
     //end
   }
